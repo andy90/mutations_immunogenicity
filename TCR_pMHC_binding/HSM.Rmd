@@ -1,0 +1,34 @@
+---
+title: "HSM"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+All the protein binding domains(PBD) in the HSM paper are aligned using the Superfamily Hidden Markov model associated with each PBD’s respective fold.
+
+In my case, the TCR sequence and the peptide sequence should also be aligned respectively. I think someone has already tried to align the TCR seuqnces in some way. If not, that will just be the most challenging problem in this work.
+
+Following the equation in Methods might be the best starting point.
+
+There are two HSM models. One model is for a single PBD family only. Within a family, such as SH2, there could be a lot of variations. Within the same family, one needs to first do the alignment. Then for each position and position-pair one defines the energy basis set (i.e. potential energy for each amino acid). This model is called the HSM/ID model.
+
+One could also develope a model where the energy base sets between each position pair are the same across all the position pairs and even all the PDB families. Only the weight associated with each position pair are changed. This model is called the HSM/D model. I am wondering why they construct the common base only for the pair-wise interaction. 
+
+The HSM/ID model outperforms HSM/D model.
+
+For the HSM/D model.
+For the unbound state, the position dependent singlet energy base set is same for the PBD(D) and LiganL(L) when position i and j are the same, this is weird.
+$H(D) = \sum_i e_{u,i}^{(1)}(D_i), H(L) = \sum_j e_{u,j}^{(1)}(L_j)$
+
+Usually a protein can contain several PBDs, which can bind with multiple peptides. To deal with that case, one can sum over the HSM/ID or HSM/D trained for different domains together. The additivity of hamiltonian is a big advantage in this case.
+
+Samething happens when D and L are at the bound state
+$H(DL) = \sum_i e_{b,i}^{(1)}(D_i) + \sum_j e_{b,j}^{(1)}(L_j) + \sum_{i,j} e_{b, ij}^{(2)}(D_i, L_j)$.
+
+The binding free energy is 
+$H(DL) - H(D) - H(L)$
+
+The training set they used consists of 2millon data points, and only 5% of them are positive (binders).

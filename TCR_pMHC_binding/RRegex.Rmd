@@ -1,0 +1,43 @@
+---
+title: "regular expression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+R by default uses Posix extended regular expression. But the other commonly used languages like Python uses Perl regular expression. The main difference is how to handle the metacharacters (metacharacters are those characters that have a special meaning and are not used for their literal meaning in regular expression. Ex, `*` means 0 or more occurenens insterad of itself. To match `*` one needs to use `\*` in pearl regular expression. However, since in R *string* `\` is used to start a escape sequence. The logic is that a pattern string is first processed by the R string engine, in which case `\` is used to escape the character following it. For example `\n` is interpreted as new line by R string. To get a real backslash in r string, one needs `\\`, which is interpreted as `\` by r string. Then it is processed by the regular expression engine. )
+
+```{r re}
+s = c("abc", "a*c")
+grepl("*", s) # this can be run
+#grepl("*", s, perl = TRUE) # this is wrong
+grepl("\\a", s, perl = TRUE)  # this is the logic flow "\\a" -> "\a" , then interpreted by regular expression
+grepl("\\*", s, perl = TRUE) # logic flow "\\*" -> "\*" -> "*"
+grepl("a[b|\\*]c", s) 
+grepl("\\n", s)
+```
+
+`a-Z` is the same as `[:alpha:]`. So when use `[a-Z]` is regular expression, it is equivalent to use `[[:alpha:]]`
+
+Parenthesis `( )` can be used to group several options together. For example `(a|b)` matches either `a` or `b`. It can also be used to capture the matched group and be used later. This is especially useful when we want to substitute a specific pattern. For example
+
+```{r substitute}
+gsub("(a)", "\\1b", s)
+```
+
+will insert `b` after the first occurences of `a`. `\\1` refers to the captured pattern in the first parenthesis. 
+
+```{r substitute2}
+gsub("(a)(b)", "\\1:\\2", s)
+```
+here `\\2` refers to the matched pattern in the second parathesis.
+
+This can be used to insert characters at a specific position
+```{r substitute 3}
+gsub("(.{2})", "\\1:", s)
+```
+
+The example above inserts character `:` after the second character.
